@@ -1,7 +1,6 @@
 package io.github.biezhi.wechat.model;
 
-import com.google.gson.JsonObject;
-import io.github.biezhi.wechat.api.WechatApi;
+import com.mywechat.api.WechatApi;
 
 /**
  * 群消息
