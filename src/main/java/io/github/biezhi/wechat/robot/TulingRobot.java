@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.biezhi.wechat.api.WechatApi.JSON;
+import static com.mywechat.api.WechatApi.JSON;
 
 /**
  * 图灵机器人实现

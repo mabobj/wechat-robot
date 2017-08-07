@@ -1,0 +1,11 @@
+# 超时配置
+http.conn-time-out=10
+http.read-time-out=20
+http.write-time-out=10
+# 茉莉机器人
+moli.api_key=a8fab57cd9c5630d7b1755771d6a84e1
+moli.api_secret=hgf1v8qvmvxa
+# 图灵机器人
+tuling.api_key=b52e62f542467a09c449825963f15bcb
+tuling.api_secret=04ce7a3fc654a9dc
+

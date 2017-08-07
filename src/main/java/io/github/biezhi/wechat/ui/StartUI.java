@@ -4,14 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.biezhi.wechat.Utils;
-import io.github.biezhi.wechat.api.WechatApi;
+import com.mywechat.api.WechatApi;
 import io.github.biezhi.wechat.handle.MessageHandle;
 import io.github.biezhi.wechat.model.Const;
 import io.github.biezhi.wechat.model.Environment;
 import io.github.biezhi.wechat.model.GroupMessage;
 import io.github.biezhi.wechat.model.UserMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
  */
 public class StartUI extends WechatApi {
 
-    private static final Logger log = LoggerFactory.getLogger(StartUI.class);
+    private static final Logger log = LogManager.getLogger(StartUI.class);
 
     private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
@@ -147,7 +147,7 @@ public class StartUI extends WechatApi {
     }
 
     private void handle_mod(JsonObject dic) {
-        log.debug("handle modify");
+        log.debug("workbench modify");
         handle_msg(dic);
 
         JsonArray modContactList = dic.getAsJsonArray("ModContactList");
@@ -196,7 +196,7 @@ public class StartUI extends WechatApi {
     }
 
     public void handle_msg(JsonObject dic) {
-        log.debug("handle message");
+        log.debug("workbench message");
         if (null != messageHandle) {
             messageHandle.wxSync(dic);
         }
@@ -336,7 +336,7 @@ public class StartUI extends WechatApi {
             dst = new HashMap<String, Object>(this.getUserById(msg.get("ToUserName").getAsString()));
         }
         if (null != group) {
-            log.info("{} |{}| {} -> {}: {}\n", msg_id, group.get("ShowName"),
+            log.info("{} |{}| {} -> {}: {}\n", msg.get("FromUserName").getAsString(), group.get("ShowName"),
                     dst.get("ShowName"), userMessage.getLog());
         } else {
             log.info("{} {} -> {}: {}\n", msg_id, src.get("ShowName"),

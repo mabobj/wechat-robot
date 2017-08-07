@@ -1,0 +1,12 @@
+2017-07-27 12:18:22.837 [main] DEBUG com.mywechat.api.WechatApi - [*] 请求 => Request{method=GET, url=https://login.weixin.qq.com/jslogin?appid=wx782c26e4c19acffb&lang=zh_CN&fun=new&_=1501129102818, tag=null}
+
+2017-07-27 12:18:23.156 [main] DEBUG com.mywechat.api.WechatApi - [*] 响应 => window.QRLogin.code = 200; window.QRLogin.uuid = "4baP1NdlnQ==";
+2017-07-27 12:18:23.329 [main] DEBUG com.mywechat.api.WechatApi - [*] 请求 => Request{method=GET, url=https://wx.qq.com/cgi-bin/mmwebwx-bin/login?tip=1&uuid=4baP1NdlnQ==&_1501129103329, tag=null}
+
+2017-07-27 12:18:48.538 [main] DEBUG com.mywechat.api.WechatApi - [*] 响应 => window.code=408;
+2017-07-27 12:18:48.538 [main] WARN  com.mywechat.api.WechatApi - [登陆超时] 
+2017-07-27 12:18:48.539 [main] DEBUG com.mywechat.api.WechatApi - [*] 请求 => Request{method=GET, url=https://login.weixin.qq.com/jslogin?appid=wx782c26e4c19acffb&lang=zh_CN&fun=new&_=1501129128539, tag=null}
+
+2017-07-27 12:18:48.594 [main] DEBUG com.mywechat.api.WechatApi - [*] 响应 => window.QRLogin.code = 200; window.QRLogin.uuid = "oagLyqECJQ==";
+2017-07-27 12:18:48.702 [main] DEBUG com.mywechat.api.WechatApi - [*] 请求 => Request{method=GET, url=https://wx.qq.com/cgi-bin/mmwebwx-bin/login?tip=1&uuid=oagLyqECJQ==&_1501129128702, tag=null}
+

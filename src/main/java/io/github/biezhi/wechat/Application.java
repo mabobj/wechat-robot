@@ -1,8 +1,6 @@
 package io.github.biezhi.wechat;
 
-import io.github.biezhi.wechat.robot.MoliRobot;
 import io.github.biezhi.wechat.model.Environment;
-import io.github.biezhi.wechat.robot.TulingRobot;
 import io.github.biezhi.wechat.ui.StartUI;
 
 /**
@@ -14,11 +12,13 @@ public class Application {
         System.setProperty("https.protocols", "TLSv1");
         System.setProperty("jsse.enableSNIExtension", "false");
 
-        Environment environment = Environment.of("classpath:config.properties");
+        Environment environment = Environment.of("classpath:config.properties.bak");
 
         StartUI startUI = new StartUI(environment);
 
-        startUI.setMsgHandle(new TulingRobot(environment));
+//        startUI.setMsgHandle(new MoliRobot(environment));
+        //startUI.setMsgHandle(new MaJiangCenter());
+
         startUI.start();
     }
 

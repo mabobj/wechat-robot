@@ -1,29 +1,31 @@
-package io.github.biezhi.wechat.api;
+package com.mywechat.api;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.mywechat.workbench.model.Session;
 import io.github.biezhi.wechat.Utils;
 import io.github.biezhi.wechat.model.Const;
 import io.github.biezhi.wechat.model.Environment;
-import io.github.biezhi.wechat.model.Session;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 微信API实现
  *
  * @author biezhi
- *         16/06/2017
+ * 16/06/2017
  */
 public class WechatApi {
 
-    private static final Logger log = LoggerFactory.getLogger(WechatApi.class);
+    private static final Logger log = LogManager.getLogger(WechatApi.class);
 
     // 配置文件环境参数
     protected Environment environment;
@@ -39,6 +41,9 @@ public class WechatApi {
 
     // 登录会话
     protected Session session;
+    public Session getSession(){
+        return session;
+    }
 
     protected Map<String, Object> baseRequest;
 
@@ -56,6 +61,10 @@ public class WechatApi {
     // 登陆账号信息
     protected Map<String, Object> user;
 
+    public Map<String, Object> getUser() {
+        return user;
+    }
+
     // 好友+群聊+公众号+特殊账号
     protected JsonArray memberList;
 
@@ -64,11 +73,23 @@ public class WechatApi {
     // 好友
     protected JsonArray contactList;
 
+    public JsonArray getContactList() {
+        return contactList;
+    }
+
     // 群
     protected JsonArray groupList;
 
+    public JsonArray getGroupList() {
+        return groupList;
+    }
+
     // 群聊成员字典 {group_id:[]}
     protected Map<String, JsonArray> groupMemeberList = new HashMap<String, JsonArray>();
+
+    public Map<String, JsonArray> getGroupMemeberList() {
+        return groupMemeberList;
+    }
 
     // 公众号／服务号
     protected JsonArray publicUsersList;
@@ -125,10 +146,10 @@ public class WechatApi {
         conf.put("API_webwxdownloadmedia", "https://" + o + "/cgi-bin/mmwebwx-bin/webwxgetmedia");
         conf.put("API_webwxuploadmedia", "https://" + o + "/cgi-bin/mmwebwx-bin/webwxuploadmedia");
         conf.put("API_webwxpreview", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxpreview");
-        conf.put("API_webwxinit", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxinit");
+        conf.put("API_webwxinit", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxinit");//获取聊天列表
         conf.put("API_webwxgetcontact", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxgetcontact");
         conf.put("API_webwxsync", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxsync");
-        conf.put("API_webwxbatchgetcontact", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxbatchgetcontact");
+        conf.put("API_webwxbatchgetcontact", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxbatchgetcontact");//群成员信息
         conf.put("API_webwxgeticon", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxgeticon");
         conf.put("API_webwxsendmsg", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxsendmsg");
         conf.put("API_webwxsendmsgimg", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxsendmsgimg");
@@ -143,13 +164,13 @@ public class WechatApi {
         conf.put("API_webwxgetvoice", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxgetvoice");
         conf.put("API_webwxupdatechatroom", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxupdatechatroom");
         conf.put("API_webwxcreatechatroom", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxcreatechatroom");
-        conf.put("API_webwxstatusnotify", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxstatusnotify");
+        conf.put("API_webwxstatusnotify", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxstatusnotify");//打开消息
         conf.put("API_webwxcheckurl", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxcheckurl");
-        conf.put("API_webwxverifyuser", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxverifyuser");
+        conf.put("API_webwxverifyuser", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxverifyuser");//添加用户
         conf.put("API_webwxfeedback", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxsendfeedback");
         conf.put("API_webwxreport", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxstatreport");
         conf.put("API_webwxsearch", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxsearchcontact");
-        conf.put("API_webwxoplog", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxoplog");
+        conf.put("API_webwxoplog", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxoplog");//设置备注
         conf.put("API_checkupload", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxcheckupload");
         conf.put("API_webwxrevokemsg", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxrevokemsg");
         conf.put("API_webwxpushloginurl", "https://" + e + "/cgi-bin/mmwebwx-bin/webwxpushloginurl");
@@ -171,7 +192,7 @@ public class WechatApi {
         conf.put("MSGTYPE_VIDEO", "43");
         conf.put("MSGTYPE_MICROVIDEO", "62");
         conf.put("MSGTYPE_EMOTICON", "47");
-        conf.put("MSGTYPE_APP", "49");
+        conf.put("MSGTYPE_APP", "49");//转发
         conf.put("MSGTYPE_VOIPMSG", "50");
         conf.put("MSGTYPE_VOIPNOTIFY", "52");
         conf.put("MSGTYPE_VOIPINVITE", "53");
@@ -181,7 +202,7 @@ public class WechatApi {
         conf.put("MSGTYPE_POSSIBLEFRIEND_MSG", "40");
         conf.put("MSGTYPE_VERIFYMSG", "37");
         conf.put("MSGTYPE_SHARECARD", "42");
-        conf.put("MSGTYPE_SYS", "10000");
+        conf.put("MSGTYPE_SYS", "10000");//转账、红包
         conf.put("MSGTYPE_RECALLED", "10002");
         conf.put("APPMSGTYPE_TEXT", "1");
         conf.put("APPMSGTYPE_IMG", "2");
@@ -323,7 +344,7 @@ public class WechatApi {
         Request.Builder requestBuilder = new Request.Builder().url(this.redirectUri);
         Request request = requestBuilder.build();
 
-        log.debug("[*] 请求 => {}\n", request);
+        log.debug("[*] 请求 => {}", request);
         try {
             Response response = client.newCall(request).execute();
             Headers headers = response.headers();
@@ -357,7 +378,6 @@ public class WechatApi {
      * 微信初始化
      *
      * @return
-     * @throws WechatException
      */
     public boolean webwxinit() {
         if (null == session) {
@@ -432,6 +452,7 @@ public class WechatApi {
         if (null == response) {
             return false;
         }
+        log.debug("getContact => {}",response.toString());
 
         this.memberCount = response.get("MemberCount").getAsInt();
         this.memberList = response.getAsJsonArray("MemberList");
@@ -463,22 +484,22 @@ public class WechatApi {
     }
 
     /**
-     * 批量获取群成员
+     * 批量获取成员
      *
      * @param groupIds
      * @return
      */
-    public JsonArray batchGetContact(List<String> groupIds) {
+    public JsonArray batchGetContact(List<String> userNames, String EncryChatRoomId) {
         String url = conf.get("API_webwxbatchgetcontact") + "?type=ex&r=%s&pass_ticket=%s";
         url = String.format(url, System.currentTimeMillis(), session.getPassTicket());
 
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("BaseRequest", this.baseRequest);
-        params.put("Count", groupIds.size());
+        params.put("Count", userNames.size());
 
         List<Map> list = new ArrayList<Map>();
-        for (String groupId : groupIds) {
-            list.add(Utils.createMap("UserName", groupId, "EncryChatRoomId", ""));
+        for (String groupId : userNames) {
+            list.add(Utils.createMap("UserName", groupId, "EncryChatRoomId", EncryChatRoomId));
         }
         params.put("List", list);
 
@@ -488,6 +509,23 @@ public class WechatApi {
         }
         JsonObject dic = response.getAsJsonObject();
         return dic.get("ContactList").getAsJsonArray();
+    }
+
+    public JsonArray batchGetContact(String userNames, String EncryChatRoomId) {
+        List list = new ArrayList();
+        list.add(userNames);
+        return batchGetContact(list, EncryChatRoomId);
+    }
+
+    /**
+     * 获取用户信息
+     * @param userNames
+     * @return
+     */
+    public JsonArray batchGetContact(String userNames) {
+        List list = new ArrayList();
+        list.add(userNames);
+        return batchGetContact(list, "");
     }
 
     /**
@@ -520,40 +558,6 @@ public class WechatApi {
     }
 
     /**
-     * 拉取群成员
-     *
-     * @return
-     */
-    public void fetchGroupContacts() {
-        log.debug("fetchGroupContacts");
-
-        List<String> groupIds = new ArrayList<String>();
-
-        Map<String, JsonObject> g_dict = new HashMap<String, JsonObject>();
-
-        for (JsonElement element : groupList) {
-            JsonObject group = element.getAsJsonObject();
-            groupIds.add(group.get("UserName").getAsString());
-            g_dict.put(group.get("UserName").getAsString(), group);
-        }
-
-        JsonArray groupMembers = batchGetContact(groupIds);
-        for (JsonElement element : groupMembers) {
-            JsonObject member_list = element.getAsJsonObject();
-            String g_id = member_list.get("UserName").getAsString();
-            JsonObject group = g_dict.get(g_id);
-            group.addProperty("MemberCount", member_list.get("MemberCount").getAsInt());
-            group.addProperty("OwnerUin", member_list.get("OwnerUin").getAsInt());
-            this.groupMemeberList.put(g_id, member_list.get("MemberList").getAsJsonArray());
-        }
-    }
-
-    // TODO
-    public boolean snapshot() {
-        return false;
-    }
-
-    /**
      * 微信同步检查
      *
      * @return
@@ -583,6 +587,230 @@ public class WechatApi {
         }
         return arr;
     }
+
+
+    /**
+     * 打开消息窗口
+     *
+     * @return
+     */
+    public boolean openMsgBox(String FromUserName, String ToUserName) {
+        String url = conf.get("API_webwxstatusnotify") + "?lang=%s&pass_ticket=%s";
+        url = String.format(url, conf.get("LANG"), session.getPassTicket());
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("BaseRequest", this.baseRequest);
+        params.put("Code", 1);
+        params.put("FromUserName", FromUserName);
+        params.put("ToUserName", ToUserName);
+        params.put("ClientMsgId", System.currentTimeMillis());
+
+        JsonObject response = doPost(url, params).getAsJsonObject();
+        if (null == response) {
+            return false;
+        }
+        JsonObject baseResponse = response.getAsJsonObject("BaseResponse");
+        return baseResponse.get("Ret").getAsInt() == 0;
+    }
+
+
+    /**
+     * 发送微信消息
+     *
+     * @param msg
+     * @param to
+     * @return
+     */
+    public JsonObject wxSendMessage(String msg, String to) {
+
+        String url = conf.get("API_webwxsendmsg") + "?pass_ticket=%s";
+        url = String.format(url, session.getPassTicket());
+
+        String clientMsgId = System.currentTimeMillis() + Utils.getRandomNumber(5);
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("BaseRequest", this.baseRequest);
+        Map<String, Object> Msg = new HashMap<String, Object>();
+        Msg.put("Type", 1);
+        Msg.put("Content", Utils.unicodeToUtf8(msg));
+        Msg.put("FromUserName", this.user.get("UserName"));
+        Msg.put("ToUserName", to);
+        Msg.put("LocalID", clientMsgId);
+        Msg.put("ClientMsgId", clientMsgId);
+        params.put("Msg", Msg);
+
+
+        String finalUrl = url;
+        editRemarksExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                doPost(finalUrl, params);
+            }
+        });
+
+
+        /*JsonElement response = doPost(url, params);
+        if (null == response) {
+            return null;
+        }
+        return response.getAsJsonObject();*/
+        return null;
+    }
+
+    /**
+     * 发送文本消息
+     *
+     * @param msg
+     * @param uid
+     */
+    public void sendText(String msg, String uid) {
+        this.wxSendMessage(msg, uid);
+    }
+
+    private ExecutorService editRemarksExecutorService = Executors.newFixedThreadPool(1);
+
+    /**
+     * 修改备注
+     * 1秒钟更新1条
+     *
+     * @param UserName
+     * @param RemarkName
+     * @return
+     */
+    public boolean editRemarks(String UserName, String RemarkName) {
+        String url = conf.get("API_webwxoplog");
+        //url = String.format(url, session.getPassTicket());
+
+        Map params = new HashMap();
+        params.put("BaseRequest", this.baseRequest);
+        params.put("CmdId", 2);
+        params.put("RemarkName", RemarkName);
+        params.put("UserName", UserName);
+        final JsonElement[] response = new JsonElement[1];
+        editRemarksExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                log.debug("RemarkName => {} UserName => {}", RemarkName, UserName);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                
+                doPost(url, params);
+            }
+        });
+        return true;
+    }
+
+
+    /**
+     * 添加好友
+     *
+     * @param userName
+     * @param ticket
+     * @return
+     */
+    public boolean addFriend(String userName, String ticket) {
+        String url = conf.get("API_webwxverifyuser") + "?r=%s";
+        url = String.format(url, System.currentTimeMillis());
+
+
+        Map params = new HashMap();
+        params.put("BaseRequest", this.baseRequest);
+
+        params.put("Opcode", 3);
+
+        List<Map> VerifyUserList = new ArrayList<Map>();
+        Map tmap = new HashMap();
+        tmap.put("Value", userName);
+        tmap.put("VerifyUserTicket", ticket);
+        VerifyUserList.add(tmap);
+
+        params.put("VerifyUserList", VerifyUserList);
+        params.put("VerifyUserListSize", VerifyUserList.size());
+
+        params.put("VerifyContent", "");
+        params.put("SceneListCount", 1);
+
+        List<Integer> SceneList = new ArrayList<Integer>();
+        SceneList.add(33);
+        params.put("SceneList", SceneList);
+
+        params.put("skey", session.getSkey());
+
+        JsonElement response = doPost(url, params);
+
+        if (null == response) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public JsonObject getContactByUserMame(String userName) {
+        for (JsonElement element : contactList) {
+            if (element.getAsJsonObject().get("UserName").getAsString().equals(userName)) {
+                return element.getAsJsonObject();
+            }
+        }
+        return null;
+    }
+
+    public JsonObject getContactByRemarkName(String RemarkName) {
+        for (JsonElement element : contactList) {
+            if (element.getAsJsonObject().get("RemarkName").getAsString().equals(RemarkName)) {
+                return element.getAsJsonObject();
+            }
+        }
+        return null;
+    }
+
+    //===============================================
+
+
+    /**
+     * 拉取群成员
+     *
+     * @return
+     */
+    public void fetchGroupContacts() {
+        log.debug("fetchGroupContacts");
+
+        List groupIds = new ArrayList();
+
+        Map<String, JsonObject> g_dict = new HashMap<String, JsonObject>();
+
+        for (JsonElement element : groupList) {
+            JsonObject group = element.getAsJsonObject();
+            groupIds.add(group.get("UserName").getAsString());
+            g_dict.put(group.get("UserName").getAsString(), group);
+        }
+
+        JsonArray groupMembers = batchGetContact(groupIds, "");
+
+        for (JsonElement element : groupMembers) {
+            JsonObject member_list = element.getAsJsonObject();
+            String g_id = member_list.get("UserName").getAsString();
+            JsonObject group = g_dict.get(g_id);
+            group.addProperty("MemberCount", member_list.get("MemberCount").getAsInt());
+            group.addProperty("OwnerUin", member_list.get("OwnerUin").getAsInt());
+            this.groupMemeberList.put(g_id, member_list.get("MemberList").getAsJsonArray());
+        }
+
+    }
+
+    // TODO
+    public boolean snapshot() {
+        return false;
+    }
+
 
     /**
      * 根据用户id和群id查询用户信息
@@ -704,46 +932,6 @@ public class WechatApi {
         return user;
     }
 
-    /**
-     * 发送微信消息
-     *
-     * @param msg
-     * @param to
-     * @return
-     */
-    public JsonObject wxSendMessage(String msg, String to) {
-
-        String url = conf.get("API_webwxsendmsg") + "?pass_ticket=%s";
-        url = String.format(url, session.getPassTicket());
-
-        String clientMsgId = System.currentTimeMillis() + Utils.getRandomNumber(5);
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("BaseRequest", this.baseRequest);
-        Map<String, Object> Msg = new HashMap<String, Object>();
-        Msg.put("Type", 1);
-        Msg.put("Content", Utils.unicodeToUtf8(msg));
-        Msg.put("FromUserName", this.user.get("UserName"));
-        Msg.put("ToUserName", to);
-        Msg.put("LocalID", clientMsgId);
-        Msg.put("ClientMsgId", clientMsgId);
-        params.put("Msg", Msg);
-
-        JsonElement response = doPost(url, params);
-        if (null == response) {
-            return null;
-        }
-        return response.getAsJsonObject();
-    }
-
-    /**
-     * 发送文本消息
-     *
-     * @param msg
-     * @param uid
-     */
-    public void sendText(String msg, String uid) {
-        this.wxSendMessage(msg, uid);
-    }
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -799,6 +987,7 @@ public class WechatApi {
         RequestBody requestBody = RequestBody.create(JSON, "");
         if (null != object) {
             bodyJson = Utils.toJson(object);
+            log.debug("POST JSON BODY => {}", bodyJson);
             requestBody = RequestBody.create(JSON, bodyJson);
         }
 
